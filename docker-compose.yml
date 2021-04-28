@@ -1,0 +1,39 @@
+version: "3"
+networks:
+  development:
+volumes:
+  db_data:
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: app
+    volumes:
+      - .:/var/app
+    networks:
+      - development
+    ports:
+      - 3000:3000
+    stdin_open: true
+    tty: true
+    env_file: .env.development
+    entrypoint: dev-entrypoint.sh
+    command: ["rails", "server", "-p", "3000", "-b", "0.0.0.0"]
+    environment:
+      RAILS_ENV: development
+    depends_on:
+      - database
+
+  database:
+    image: postgres:12.5-alpine
+    container_name: database
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - development
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - 5099:5432
