@@ -5,7 +5,13 @@ class TaskController < ApplicationController
   end
 
   def create
-    task = Task.create(name: "test", description: "test description")
-    render :json => task
+    task = Task.new(name: params[:name], description: params[:description])
+
+    if task.valid?
+      task.save!
+      render :json => task
+    else
+      render :json => { error: 'Params are incorrect!' }, status: :bad_request
+    end    
   end
 end
